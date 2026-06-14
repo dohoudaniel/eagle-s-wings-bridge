@@ -14,11 +14,14 @@ import { Route as StoriesRouteImport } from './routes/stories'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
 import { Route as ProgramsMotherlessHomeRouteImport } from './routes/programs.motherless-home'
 import { Route as ProgramsEmpowermentRouteImport } from './routes/programs.empowerment'
 import { Route as ProgramsElderlyCareRouteImport } from './routes/programs.elderly-care'
+import { Route as DonateVerifyRouteImport } from './routes/donate.verify'
 
 const VolunteerRoute = VolunteerRouteImport.update({
   id: '/volunteer',
@@ -45,6 +48,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -54,6 +62,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProgramsRoute,
 } as any)
 const ProgramsMotherlessHomeRoute = ProgramsMotherlessHomeRouteImport.update({
   id: '/motherless-home',
@@ -70,88 +83,110 @@ const ProgramsElderlyCareRoute = ProgramsElderlyCareRouteImport.update({
   path: '/elderly-care',
   getParentRoute: () => ProgramsRoute,
 } as any)
+const DonateVerifyRoute = DonateVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => DonateRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
-  '/donate': typeof DonateRoute
+  '/donate': typeof DonateRouteWithChildren
   '/programs': typeof ProgramsRouteWithChildren
   '/stories': typeof StoriesRoute
   '/volunteer': typeof VolunteerRoute
+  '/donate/verify': typeof DonateVerifyRoute
   '/programs/elderly-care': typeof ProgramsElderlyCareRoute
   '/programs/empowerment': typeof ProgramsEmpowermentRoute
   '/programs/motherless-home': typeof ProgramsMotherlessHomeRoute
+  '/programs/': typeof ProgramsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
-  '/donate': typeof DonateRoute
-  '/programs': typeof ProgramsRouteWithChildren
+  '/donate': typeof DonateRouteWithChildren
   '/stories': typeof StoriesRoute
   '/volunteer': typeof VolunteerRoute
+  '/donate/verify': typeof DonateVerifyRoute
   '/programs/elderly-care': typeof ProgramsElderlyCareRoute
   '/programs/empowerment': typeof ProgramsEmpowermentRoute
   '/programs/motherless-home': typeof ProgramsMotherlessHomeRoute
+  '/programs': typeof ProgramsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
-  '/donate': typeof DonateRoute
+  '/donate': typeof DonateRouteWithChildren
   '/programs': typeof ProgramsRouteWithChildren
   '/stories': typeof StoriesRoute
   '/volunteer': typeof VolunteerRoute
+  '/donate/verify': typeof DonateVerifyRoute
   '/programs/elderly-care': typeof ProgramsElderlyCareRoute
   '/programs/empowerment': typeof ProgramsEmpowermentRoute
   '/programs/motherless-home': typeof ProgramsMotherlessHomeRoute
+  '/programs/': typeof ProgramsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
     | '/donate'
     | '/programs'
     | '/stories'
     | '/volunteer'
+    | '/donate/verify'
     | '/programs/elderly-care'
     | '/programs/empowerment'
     | '/programs/motherless-home'
+    | '/programs/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
     | '/donate'
-    | '/programs'
     | '/stories'
     | '/volunteer'
+    | '/donate/verify'
     | '/programs/elderly-care'
     | '/programs/empowerment'
     | '/programs/motherless-home'
+    | '/programs'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
     | '/donate'
     | '/programs'
     | '/stories'
     | '/volunteer'
+    | '/donate/verify'
     | '/programs/elderly-care'
     | '/programs/empowerment'
     | '/programs/motherless-home'
+    | '/programs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
-  DonateRoute: typeof DonateRoute
+  DonateRoute: typeof DonateRouteWithChildren
   ProgramsRoute: typeof ProgramsRouteWithChildren
   StoriesRoute: typeof StoriesRoute
   VolunteerRoute: typeof VolunteerRoute
@@ -194,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -207,6 +249,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/programs/': {
+      id: '/programs/'
+      path: '/'
+      fullPath: '/programs/'
+      preLoaderRoute: typeof ProgramsIndexRouteImport
+      parentRoute: typeof ProgramsRoute
     }
     '/programs/motherless-home': {
       id: '/programs/motherless-home'
@@ -229,19 +278,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramsElderlyCareRouteImport
       parentRoute: typeof ProgramsRoute
     }
+    '/donate/verify': {
+      id: '/donate/verify'
+      path: '/verify'
+      fullPath: '/donate/verify'
+      preLoaderRoute: typeof DonateVerifyRouteImport
+      parentRoute: typeof DonateRoute
+    }
   }
 }
+
+interface DonateRouteChildren {
+  DonateVerifyRoute: typeof DonateVerifyRoute
+}
+
+const DonateRouteChildren: DonateRouteChildren = {
+  DonateVerifyRoute: DonateVerifyRoute,
+}
+
+const DonateRouteWithChildren =
+  DonateRoute._addFileChildren(DonateRouteChildren)
 
 interface ProgramsRouteChildren {
   ProgramsElderlyCareRoute: typeof ProgramsElderlyCareRoute
   ProgramsEmpowermentRoute: typeof ProgramsEmpowermentRoute
   ProgramsMotherlessHomeRoute: typeof ProgramsMotherlessHomeRoute
+  ProgramsIndexRoute: typeof ProgramsIndexRoute
 }
 
 const ProgramsRouteChildren: ProgramsRouteChildren = {
   ProgramsElderlyCareRoute: ProgramsElderlyCareRoute,
   ProgramsEmpowermentRoute: ProgramsEmpowermentRoute,
   ProgramsMotherlessHomeRoute: ProgramsMotherlessHomeRoute,
+  ProgramsIndexRoute: ProgramsIndexRoute,
 }
 
 const ProgramsRouteWithChildren = ProgramsRoute._addFileChildren(
@@ -251,8 +320,9 @@ const ProgramsRouteWithChildren = ProgramsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
-  DonateRoute: DonateRoute,
+  DonateRoute: DonateRouteWithChildren,
   ProgramsRoute: ProgramsRouteWithChildren,
   StoriesRoute: StoriesRoute,
   VolunteerRoute: VolunteerRoute,

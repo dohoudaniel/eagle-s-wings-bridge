@@ -18,10 +18,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         donate:
           "bg-success text-success-foreground shadow-soft hover:shadow-glow hover:-translate-y-0.5 transition-all duration-300 font-semibold",
-        hero:
-          "bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-glow hover:-translate-y-0.5 transition-all duration-300 font-semibold",
-        warm:
-          "bg-warm text-warm-foreground shadow-soft hover:opacity-90 transition",
+        hero: "bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-glow hover:-translate-y-0.5 transition-all duration-300 font-semibold",
+        warm: "bg-warm text-warm-foreground shadow-soft hover:opacity-90 transition",
         outlineLight:
           "border border-background/30 text-background bg-transparent hover:bg-background/10 transition",
       },

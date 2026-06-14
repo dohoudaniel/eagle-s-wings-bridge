@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
@@ -38,7 +38,10 @@ export const Route = createRootRoute({
           "A humanitarian bridge between Europe and Nigeria, supporting vulnerable children, the elderly, and empowering women and youth.",
       },
       { property: "og:title", content: "Eagle's Wings Empowerment" },
-      { property: "og:description", content: "Restoring dignity and opportunity to those who need it most." },
+      {
+        property: "og:description",
+        content: "Restoring dignity and opportunity to those who need it most.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -70,13 +73,16 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
+      {!isAdmin && <Footer />}
     </div>
   );
 }

@@ -30,7 +30,7 @@ export function Navbar() {
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
         scrolled
           ? "bg-background/85 backdrop-blur-md border-b border-border shadow-soft"
-          : "bg-transparent"
+          : "bg-transparent",
       )}
     >
       <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
@@ -40,7 +40,9 @@ export function Navbar() {
           </div>
           <div className="leading-tight">
             <div className="font-display font-bold text-base">Eagle's Wings</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Empowerment</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Empowerment
+            </div>
           </div>
         </Link>
 
