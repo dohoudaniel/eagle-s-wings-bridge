@@ -7,7 +7,7 @@ import { ResourceManager, type FieldConfig } from "@/components/admin/ResourceMa
 import { Sidebar, type AdminTab } from "@/components/admin/Sidebar";
 import { SubmissionManager } from "@/components/admin/SubmissionManager";
 import { ToastContainer } from "@/components/admin/Toast";
-import { adminApi, type ContactSubmission, type NewsletterSubscriber, type VolunteerSubmission } from "@/lib/admin-api";
+import { adminApi, type ContactSubmission, type Donation, type NewsletterSubscriber, type VolunteerSubmission } from "@/lib/admin-api";
 import { useToast } from "@/hooks/use-toast";
 
 export const Route = createFileRoute("/admin")({
@@ -91,15 +91,34 @@ const donationConfigFields: FieldConfig[] = [
   { name: "order", label: "Order", type: "number" },
 ];
 
+const teamMemberFields: FieldConfig[] = [
+  { name: "name", label: "Name", type: "text", required: true },
+  { name: "role", label: "Role", type: "text", required: true },
+  { name: "bio", label: "Bio", type: "textarea" },
+  { name: "image_url", label: "Photo", type: "image" },
+  { name: "email", label: "Email", type: "text" },
+  { name: "order", label: "Order", type: "number" },
+  { name: "is_active", label: "Active", type: "checkbox" },
+];
+
+function hasAdminSession() {
+  if (typeof document === "undefined") return false;
+  return /(?:^|; )csrf_token=/.test(document.cookie);
+}
+
 function AdminPage() {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("admin_token"));
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(hasAdminSession());
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
   const { toasts, addToast, removeToast } = useToast();
 
-  const handleLogin = () => setToken(localStorage.getItem("admin_token"));
-  const handleLogout = () => {
-    localStorage.removeItem("admin_token");
-    setToken(null);
+  const handleLogin = () => setIsLoggedIn(true);
+  const handleLogout = async () => {
+    try {
+      await adminApi.logout();
+    } catch {
+      // Ignore logout errors; clearing local state is enough for UI.
+    }
+    setIsLoggedIn(false);
   };
 
   const content = useMemo(() => {
@@ -317,6 +336,7 @@ function AdminPage() {
               { value: "archived", label: "Archived" },
             ]}
             onStatusChange={adminApi.updateContactStatus}
+            onNotesChange={adminApi.updateContactNotes}
             onError={props.onError}
           />
         );
@@ -357,9 +377,10 @@ function AdminPage() {
               { value: "rejected", label: "Rejected" },
             ]}
             onStatusChange={adminApi.updateVolunteerStatus}
+            onNotesChange={adminApi.updateVolunteerNotes}
             onDownload={async (item) => {
               const data = await adminApi.getVolunteerCvUrl(item.id);
-              window.open(data.signed_url, "_blank");
+              window.open(data.signed_url, "_blank", "noopener,noreferrer");
             }}
             onError={props.onError}
           />
@@ -389,12 +410,62 @@ function AdminPage() {
             onError={props.onError}
           />
         );
+      case "team-members":
+        return (
+          <ResourceManager
+            title="Team Members"
+            fields={teamMemberFields}
+            load={adminApi.listTeamMembers}
+            create={adminApi.createTeamMember}
+            update={adminApi.updateTeamMember}
+            remove={adminApi.deleteTeamMember}
+            columns={[
+              { key: "name", header: "Name" },
+              { key: "role", header: "Role" },
+              { key: "email", header: "Email" },
+              { key: "order", header: "Order" },
+            ]}
+            {...props}
+          />
+        );
+      case "donations":
+        return (
+          <SubmissionManager<Donation>
+            title="Donations"
+            load={adminApi.listDonations}
+            columns={[
+              { key: "donor_name", header: "Donor" },
+              { key: "donor_email", header: "Email" },
+              { key: "amount", header: "Amount", render: (item) => `${item.amount} ${item.currency}` },
+              { key: "frequency", header: "Frequency" },
+              {
+                key: "status",
+                header: "Status",
+                render: (item) => (
+                  <span
+                    className={`inline-flex px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                      item.status === "completed"
+                        ? "bg-green-100 text-green-700"
+                        : item.status === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {item.status}
+                  </span>
+                ),
+              },
+              { key: "created_at", header: "Date" },
+            ]}
+            onError={props.onError}
+          />
+        );
       default:
         return null;
     }
   }, [activeTab, addToast]);
 
-  if (!token) {
+  if (!isLoggedIn) {
     return (
       <>
         <LoginForm onLogin={handleLogin} />

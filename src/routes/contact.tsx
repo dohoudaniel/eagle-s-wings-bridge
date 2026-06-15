@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, Mail, MapPin, Phone, Send } from "lucide-react";
 import { api } from "@/lib/api";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const { getValue } = useSiteSettings();
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +52,9 @@ function ContactPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Contact"
-        title="Let's talk."
-        description="Questions, partnerships, press — we read every message."
+        eyebrow={getValue("contact_eyebrow", "Contact")}
+        title={getValue("contact_title", "Let's talk.")}
+        description={getValue("contact_description", "Questions, partnerships, press — we read every message.")}
       />
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-[1.2fr_1fr] gap-10 max-w-6xl">
@@ -125,9 +127,17 @@ function ContactPage() {
 
           <aside className="space-y-4">
             {[
-              { icon: MapPin, title: "Visit us", lines: ["Lagos, Nigeria", "Berlin, Germany"] },
-              { icon: Mail, title: "Email", lines: ["hello@eagleswings.org"] },
-              { icon: Phone, title: "Call", lines: ["+234 800 000 0000", "+49 30 0000 0000"] },
+              {
+                icon: MapPin,
+                title: "Visit us",
+                lines: getValue("contact_address", "Lagos, Nigeria · Berlin, Germany").split(" · "),
+              },
+              { icon: Mail, title: "Email", lines: [getValue("contact_email", "hello@eagleswings.org")] },
+              {
+                icon: Phone,
+                title: "Call",
+                lines: getValue("contact_phone", "+234 800 000 0000").split(" · "),
+              },
             ].map((c) => (
               <div
                 key={c.title}

@@ -46,6 +46,22 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
     }
   }
 
+  async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      await adminApi.uploadVideo(file, "cms");
+      onSuccess("Video uploaded successfully");
+      await loadImages();
+    } catch (err) {
+      onError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
   async function handleDelete() {
     if (!imageToDelete) return;
     try {
@@ -75,12 +91,19 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Image Library</h2>
-        <label className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition cursor-pointer disabled:opacity-60">
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-          <span>{uploading ? "Uploading..." : "Upload image"}</span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
-        </label>
+        <h2 className="text-2xl font-bold text-slate-900">Media Library</h2>
+        <div className="flex items-center gap-3">
+          <label className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition cursor-pointer disabled:opacity-60">
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            <span>{uploading ? "Uploading..." : "Upload image"}</span>
+            <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+          </label>
+          <label className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition cursor-pointer disabled:opacity-60">
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            <span>{uploading ? "Uploading..." : "Upload video"}</span>
+            <input type="file" accept="video/*" className="hidden" onChange={handleVideoUpload} disabled={uploading} />
+          </label>
+        </div>
       </div>
 
       {loading ? (
@@ -100,7 +123,11 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
               className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition"
             >
               <div className="aspect-square bg-slate-100">
-                <img src={image.url} alt={image.name} className="h-full w-full object-cover" />
+                {image.name.match(/\.(mp4|webm|ogg)$/i) ? (
+                  <video src={image.url} className="h-full w-full object-cover" controls />
+                ) : (
+                  <img src={image.url} alt={image.name} className="h-full w-full object-cover" />
+                )}
               </div>
               <div className="p-3">
                 <p className="text-xs text-slate-500 truncate" title={image.name}>

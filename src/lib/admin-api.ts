@@ -1,4 +1,5 @@
 import type {
+  Donation,
   DonationConfig,
   FormResponse,
   HeroSlide,
@@ -6,29 +7,48 @@ import type {
   Program,
   SiteSetting,
   Story,
+  TeamMember,
   Testimonial,
   TimelineEvent,
 } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
-function getToken() {
-  return localStorage.getItem("admin_token");
+function getCsrfTokenFromCookie(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|; )csrf_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+let _csrfToken: string | null = null;
+
+function getCsrfToken(): string | null {
+  // Refresh from cookie in case it changed (e.g. after login in another tab).
+  return _csrfToken || getCsrfTokenFromCookie();
+}
+
+function setCsrfToken(token: string | null) {
+  _csrfToken = token;
 }
 
 async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
+  const isFormData = options?.body instanceof FormData;
+  const csrfToken = getCsrfToken();
   const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    credentials: "include",
     headers: {
-      Authorization: `Bearer ${getToken()}`,
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
       ...options?.headers,
     },
-    ...options,
   });
 
   if (response.status === 401) {
-    localStorage.removeItem("admin_token");
-    window.location.href = "/admin";
+    setCsrfToken(null);
+    if (typeof window !== "undefined") {
+      window.location.href = "/admin";
+    }
     throw new Error("Session expired. Please log in again.");
   }
 
@@ -39,12 +59,29 @@ async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
   return data as T;
 }
 
+async function fetchLogin(path: string, options: RequestInit = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options.headers },
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.detail || data.message || `Login failed: ${response.status}`);
+  }
+  return data as { csrf_token: string };
+}
+
 export const adminApi = {
-  login: (email: string, password: string) =>
-    fetchJson<{ access_token: string }>("/admin/login", {
+  login: async (email: string, password: string) => {
+    const data = await fetchLogin("/admin/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
-    }),
+    });
+    setCsrfToken(data.csrf_token);
+    return data;
+  },
+  logout: () => fetchJson<void>("/admin/logout", { method: "POST" }),
 
   // Programs
   listPrograms: () => fetchJson<Program[]>("/admin/programs"),
@@ -111,12 +148,57 @@ export const adminApi = {
   // Submissions
   listContacts: () => fetchJson<ContactSubmission[]>("/admin/contacts"),
   updateContactStatus: (id: string, status: string) =>
-    fetchJson<ContactSubmission>(`/admin/contacts/${id}/status?status_value=${status}`, { method: "PATCH" }),
+    fetchJson<ContactSubmission>(`/admin/contacts/${id}/status?status_value=${encodeURIComponent(status)}`, { method: "PATCH" }),
+  updateContactNotes: (id: string, notes: string) => {
+    const formData = new FormData();
+    formData.append("notes", notes);
+    return fetchJson<ContactSubmission>(`/admin/contacts/${id}/notes`, { method: "PATCH", body: formData });
+  },
   listVolunteers: () => fetchJson<VolunteerSubmission[]>("/admin/volunteers"),
   updateVolunteerStatus: (id: string, status: string) =>
-    fetchJson<VolunteerSubmission>(`/admin/volunteers/${id}/status?status_value=${status}`, { method: "PATCH" }),
+    fetchJson<VolunteerSubmission>(`/admin/volunteers/${id}/status?status_value=${encodeURIComponent(status)}`, { method: "PATCH" }),
+  updateVolunteerNotes: (id: string, notes: string) => {
+    const formData = new FormData();
+    formData.append("notes", notes);
+    return fetchJson<VolunteerSubmission>(`/admin/volunteers/${id}/notes`, { method: "PATCH", body: formData });
+  },
   getVolunteerCvUrl: (id: string) => fetchJson<{ signed_url: string }>(`/admin/volunteers/${id}/cv-url`),
   listNewsletterSubscribers: () => fetchJson<NewsletterSubscriber[]>("/admin/newsletter-subscribers"),
+
+  // Team members
+  listTeamMembers: () => fetchJson<TeamMember[]>("/admin/team-members"),
+  createTeamMember: (body: Record<string, unknown>) =>
+    fetchJson<TeamMember>("/admin/team-members", { method: "POST", body: JSON.stringify(body) }),
+  updateTeamMember: (id: string, body: Record<string, unknown>) =>
+    fetchJson<TeamMember>(`/admin/team-members/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  deleteTeamMember: (id: string) => fetchJson<void>(`/admin/team-members/${id}`, { method: "DELETE" }),
+
+  // Donations
+  listDonations: (params?: { status?: string; limit?: number; offset?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.set("status_filter", params.status);
+    if (params?.limit !== undefined) query.set("limit", String(params.limit));
+    if (params?.offset !== undefined) query.set("offset", String(params.offset));
+    const qs = query.toString();
+    return fetchJson<Donation[]>(`/admin/donations${qs ? `?${qs}` : ""}`);
+  },
+  getDonationStats: () => fetchJson<{ total: number; completed: number; total_amount: number }>("/admin/donations/stats"),
+
+  // Dashboard
+  getDashboard: () =>
+    fetchJson<{
+      contacts_today: number;
+      volunteers_today: number;
+      donations_today: number;
+      page_views_today: number;
+      total_contacts: number;
+      total_volunteers: number;
+      total_donations: number;
+      total_donated: number;
+      recent_actions: AdminAction[];
+      recent_donations: Donation[];
+    }>("/admin/dashboard"),
+  listAdminActions: () => fetchJson<AdminAction[]>("/admin/admin-actions"),
 
   // Storage
   uploadImage: (file: File, folder = "cms") => {
@@ -126,12 +208,32 @@ export const adminApi = {
     return fetchJson<{ url: string }>("/admin/storage/images", {
       method: "POST",
       body: formData,
-      headers: {}, // Let browser set multipart boundary
+    });
+  },
+  uploadVideo: (file: File, folder = "cms") => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", folder);
+    return fetchJson<{ url: string }>("/admin/storage/videos", {
+      method: "POST",
+      body: formData,
     });
   },
   deleteImage: (url: string) => fetchJson<void>(`/admin/storage/images?url=${encodeURIComponent(url)}`, { method: "DELETE" }),
   listImages: (folder = "cms") => fetchJson<{ images: { name: string; path: string; url: string; size: number; created_at: string }[] }>(`/admin/storage/images?folder=${encodeURIComponent(folder)}`),
 };
+
+export interface AdminAction {
+  id: string;
+  admin_email: string;
+  action: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  details: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export type { Donation } from "./types";
 
 export interface ContactSubmission {
   id: string;

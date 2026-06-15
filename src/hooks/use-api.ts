@@ -12,7 +12,8 @@ export function useApi<T>(fetcher: () => Promise<T>) {
 
     fetcher()
       .then((result) => {
-        if (!cancelled) setData(result);
+        if (cancelled) return;
+        setData(result);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Unknown error");

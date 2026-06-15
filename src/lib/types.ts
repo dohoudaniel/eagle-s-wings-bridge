@@ -89,6 +89,33 @@ export interface DonationConfig {
   created_at: string;
 }
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  bio: string | null;
+  image_url: string | null;
+  email: string | null;
+  order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Donation {
+  id: string;
+  donor_name: string;
+  donor_email: string;
+  amount: number;
+  currency: string;
+  frequency: string;
+  status: string;
+  provider_reference: string | null;
+  payment_provider: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface FormResponse {
   success: boolean;
   message: string;

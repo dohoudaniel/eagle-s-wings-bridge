@@ -3,10 +3,12 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Heart, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
+import { fallbackHeroSlides } from "@/lib/fallback-content";
 import { useApi } from "@/hooks/use-api";
 
 export function Hero() {
-  const { data: slides, loading } = useApi(api.getHeroSlides);
+  const { data: rawSlides } = useApi(api.getHeroSlides);
+  const slides = rawSlides?.length ? rawSlides : fallbackHeroSlides;
   const [i, setI] = useState(0);
 
   useEffect(() => {
@@ -14,18 +16,6 @@ export function Hero() {
     const t = setInterval(() => setI((v) => (v + 1) % slides.length), 7000);
     return () => clearInterval(t);
   }, [slides]);
-
-  if (loading || !slides || slides.length === 0) {
-    return (
-      <section className="relative min-h-[80svh] overflow-hidden bg-foreground flex items-center">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="animate-pulse h-8 w-1/3 bg-background/10 rounded mb-4" />
-          <div className="animate-pulse h-16 w-2/3 bg-background/10 rounded mb-6" />
-          <div className="animate-pulse h-6 w-1/2 bg-background/10 rounded" />
-        </div>
-      </section>
-    );
-  }
 
   const slide = slides[i];
 

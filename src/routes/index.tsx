@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { Section } from "@/components/Section";
 import { Counter } from "@/components/Counter";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { api } from "@/lib/api";
 import { useApi } from "@/hooks/use-api";
+import { fallbackImpactStats, fallbackPrograms, fallbackTestimonials } from "@/lib/fallback-content";
 import { getIcon } from "@/lib/icons";
 
 export const Route = createFileRoute("/")({
@@ -27,22 +29,25 @@ function HomePage() {
   const { data: programs, loading: programsLoading } = useApi(api.getPrograms);
   const { data: testimonials, loading: testimonialsLoading } = useApi(api.getTestimonials);
 
+  const isLoading = statsLoading || programsLoading || testimonialsLoading;
+  const displayStats = stats?.length ? stats : fallbackImpactStats;
+  const displayPrograms = programs?.length ? programs : fallbackPrograms;
+  const displayTestimonials = testimonials?.length ? testimonials : fallbackTestimonials;
+
   return (
     <>
       <Hero />
 
-      {/* Impact stats */}
-      <section className="relative -mt-20 z-20 container mx-auto px-4 lg:px-8">
-        <div className="bg-card rounded-3xl shadow-elegant border border-border p-8 lg:p-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {statsLoading || !stats
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="text-center lg:text-left">
-                  <div className="animate-pulse h-10 w-10 rounded-xl bg-muted mb-3" />
-                  <div className="animate-pulse h-10 w-20 bg-muted rounded" />
-                  <div className="animate-pulse h-4 w-32 bg-muted rounded mt-1" />
-                </div>
-              ))
-            : stats.map((s) => {
+      {isLoading ? (
+        <section className="py-20 lg:py-28">
+          <LoadingSpinner message="Loading latest impact..." />
+        </section>
+      ) : (
+        <>
+          {/* Impact stats */}
+          <section className="relative -mt-20 z-20 container mx-auto px-4 lg:px-8">
+            <div className="bg-card rounded-3xl shadow-elegant border border-border p-8 lg:p-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
+              {displayStats.map((s) => {
                 const Icon = getIcon(s.icon);
                 return (
                   <div key={s.id} className="text-center lg:text-left">
@@ -56,40 +61,26 @@ function HomePage() {
                   </div>
                 );
               })}
-        </div>
-      </section>
+            </div>
+          </section>
 
-      {/* Mission strip */}
-      <Section
-        eyebrow="Our Mission"
-        align="center"
-        title={
-          <>
-            A bridge of hope between <span className="text-primary">Europe and Nigeria</span>.
-          </>
-        }
-        description="We channel global compassion into measurable local impact — restoring dignity to those society has forgotten."
-      />
+          {/* Mission strip */}
+          <Section
+            eyebrow="Our Mission"
+            align="center"
+            title={
+              <>
+                A bridge of hope between <span className="text-primary">Europe and Nigeria</span>.
+              </>
+            }
+            description="We channel global compassion into measurable local impact — restoring dignity to those society has forgotten."
+          />
 
-      {/* Programs */}
-      <section className="pb-20 lg:pb-28">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-            {programsLoading || !programs
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-3xl bg-card border border-border shadow-soft overflow-hidden"
-                  >
-                    <div className="aspect-[4/3] animate-pulse bg-muted" />
-                    <div className="p-6 space-y-3">
-                      <div className="animate-pulse h-10 w-10 rounded-xl bg-muted" />
-                      <div className="animate-pulse h-6 w-2/3 bg-muted rounded" />
-                      <div className="animate-pulse h-4 w-full bg-muted rounded" />
-                    </div>
-                  </div>
-                ))
-              : programs.map((p) => {
+          {/* Programs */}
+          <section className="pb-20 lg:pb-28">
+            <div className="container mx-auto px-4 lg:px-8">
+              <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+                {displayPrograms.map((p) => {
                   const Icon = getIcon(p.icon);
                   return (
                     <Link
@@ -125,34 +116,23 @@ function HomePage() {
                     </Link>
                   );
                 })}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 lg:py-28 bg-gradient-soft border-y border-border">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="text-xs uppercase tracking-[0.2em] font-semibold text-primary mb-3">
-              Voices
+              </div>
             </div>
-            <h2 className="text-3xl lg:text-5xl font-bold text-balance">
-              From the people we serve.
-            </h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonialsLoading || !testimonials
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-card border border-border rounded-2xl p-7 shadow-soft space-y-4"
-                  >
-                    <div className="animate-pulse h-6 w-6 bg-muted rounded" />
-                    <div className="animate-pulse h-20 w-full bg-muted rounded" />
-                    <div className="animate-pulse h-8 w-32 bg-muted rounded" />
-                  </div>
-                ))
-              : testimonials.map((t) => (
+          </section>
+
+          {/* Testimonials */}
+          <section className="py-20 lg:py-28 bg-gradient-soft border-y border-border">
+            <div className="container mx-auto px-4 lg:px-8">
+              <div className="text-center max-w-2xl mx-auto mb-14">
+                <div className="text-xs uppercase tracking-[0.2em] font-semibold text-primary mb-3">
+                  Voices
+                </div>
+                <h2 className="text-3xl lg:text-5xl font-bold text-balance">
+                  From the people we serve.
+                </h2>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {displayTestimonials.map((t) => (
                   <div
                     key={t.id}
                     className="bg-card border border-border rounded-2xl p-7 shadow-soft"
@@ -167,9 +147,11 @@ function HomePage() {
                     </div>
                   </div>
                 ))}
-          </div>
-        </div>
-      </section>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
       {/* CTA */}
       <section className="py-20 lg:py-28">

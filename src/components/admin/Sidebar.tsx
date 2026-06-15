@@ -1,4 +1,5 @@
 import {
+  Banknote,
   BarChart3,
   Calendar,
   Heart,
@@ -10,6 +11,7 @@ import {
   Megaphone,
   Settings,
   Users,
+  UsersRound,
 } from "lucide-react";
 
 export type AdminTab =
@@ -25,7 +27,9 @@ export type AdminTab =
   | "contacts"
   | "volunteers"
   | "newsletter"
-  | "storage";
+  | "storage"
+  | "team-members"
+  | "donations";
 
 const contentItems: { id: AdminTab; label: string; icon: React.ElementType }[] = [
   { id: "programs", label: "Programs", icon: Heart },
@@ -36,12 +40,14 @@ const contentItems: { id: AdminTab; label: string; icon: React.ElementType }[] =
   { id: "impact-stats", label: "Impact Stats", icon: BarChart3 },
   { id: "site-settings", label: "Site Settings", icon: Settings },
   { id: "donation-config", label: "Donation Config", icon: Heart },
+  { id: "team-members", label: "Team Members", icon: UsersRound },
 ];
 
 const submissionItems: { id: AdminTab; label: string; icon: React.ElementType }[] = [
   { id: "contacts", label: "Contacts", icon: Mail },
   { id: "volunteers", label: "Volunteers", icon: Users },
   { id: "newsletter", label: "Newsletter", icon: Inbox },
+  { id: "donations", label: "Donations", icon: Banknote },
 ];
 
 export function Sidebar({

@@ -12,7 +12,12 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    define: envDefine,
+    define: {
+      ...envDefine,
+      // Workaround for Vite 8 client injection bug (vitejs/vite#22419)
+      __BUNDLED_DEV__: "false",
+      __SERVER_FORWARD_CONSOLE__: "false",
+    },
     resolve: {
       alias: {
         "@": `${process.cwd()}/src`,

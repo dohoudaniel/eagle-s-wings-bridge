@@ -3,9 +3,11 @@ import { Heart, Mail, MapPin, Phone, Facebook, Instagram, Twitter, Linkedin } fr
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { useSiteSettings } from "@/lib/site-settings";
 import { useState } from "react";
 
 export function Footer() {
+  const { getValue } = useSiteSettings();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -36,8 +38,7 @@ export function Footer() {
             <div className="font-display font-bold">Eagle's Wings</div>
           </Link>
           <p className="mt-4 text-sm text-background/70 leading-relaxed">
-            A humanitarian bridge between Europe and Nigeria — restoring dignity to children, the
-            elderly, and empowering women & youth.
+            {getValue("footer_tagline", "A humanitarian bridge between Europe and Nigeria — restoring dignity to children, the elderly, and empowering women & youth.")}
           </p>
           <div className="flex gap-3 mt-5">
             {[
@@ -93,13 +94,13 @@ export function Footer() {
           <h4 className="font-display font-semibold mb-4">Contact</h4>
           <ul className="space-y-3 text-sm text-background/70">
             <li className="flex gap-3">
-              <MapPin className="h-4 w-4 mt-0.5 shrink-0" /> Lagos, Nigeria · Berlin, Germany
+              <MapPin className="h-4 w-4 mt-0.5 shrink-0" /> {getValue("contact_address", "Lagos, Nigeria · Berlin, Germany")}
             </li>
             <li className="flex gap-3">
-              <Mail className="h-4 w-4 mt-0.5 shrink-0" /> hello@eagleswings.org
+              <Mail className="h-4 w-4 mt-0.5 shrink-0" /> {getValue("contact_email", "hello@eagleswings.org")}
             </li>
             <li className="flex gap-3">
-              <Phone className="h-4 w-4 mt-0.5 shrink-0" /> +234 800 000 0000
+              <Phone className="h-4 w-4 mt-0.5 shrink-0" /> {getValue("contact_phone", "+234 800 000 0000")}
             </li>
           </ul>
         </div>

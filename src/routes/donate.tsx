@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/Section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { useApi } from "@/hooks/use-api";
 import { Heart, Shield, Loader2, AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/donate")({
@@ -21,10 +22,11 @@ export const Route = createFileRoute("/donate")({
   component: DonatePage,
 });
 
-const presetsEUR = [10, 25, 50, 100, 250];
-const presetsNGN = [5000, 10000, 25000, 50000, 100000];
+const fallbackEUR = [10, 25, 50, 100, 250];
+const fallbackNGN = [5000, 10000, 25000, 50000, 100000];
 
 function DonatePage() {
+  const { data: donationConfig } = useApi(api.getDonationConfig);
   const [currency, setCurrency] = useState<"EUR" | "NGN">("EUR");
   const [type, setType] = useState<"one-time" | "monthly">("one-time");
   const [amount, setAmount] = useState<number>(50);
@@ -34,7 +36,16 @@ function DonatePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const presets = currency === "EUR" ? presetsEUR : presetsNGN;
+  const configByCurrency = useMemo(() => {
+    const grouped = new Map<string, number[]>();
+    donationConfig?.forEach((cfg) => {
+      if (!grouped.has(cfg.currency)) grouped.set(cfg.currency, []);
+      grouped.get(cfg.currency)?.push(Number(cfg.amount));
+    });
+    return grouped;
+  }, [donationConfig]);
+
+  const presets = configByCurrency.get(currency) ?? (currency === "EUR" ? fallbackEUR : fallbackNGN);
   const symbol = currency === "EUR" ? "€" : "₦";
 
   async function handleSubmit(e: React.FormEvent) {
@@ -50,7 +61,11 @@ function DonatePage() {
         frequency: type,
         message: message || undefined,
       });
-      window.location.href = data.authorization_url;
+      const authUrl = new URL(data.authorization_url);
+      if (!authUrl.protocol.startsWith("https") || !authUrl.hostname.endsWith("paystack.co")) {
+        throw new Error("Invalid payment redirect URL");
+      }
+      window.location.href = authUrl.toString();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start checkout. Please try again.");
       setLoading(false);
@@ -205,30 +220,25 @@ function DonatePage() {
             <div className="rounded-3xl bg-gradient-hero p-8 text-background shadow-elegant">
               <h3 className="text-xl font-bold font-display">Your impact, today</h3>
               <ul className="mt-5 space-y-3 text-background/90 text-sm">
-                <li>
-                  •{" "}
-                  <b>
-                    {symbol}
-                    {currency === "EUR" ? 25 : 10000}
-                  </b>{" "}
-                  feeds a child for a month
-                </li>
-                <li>
-                  •{" "}
-                  <b>
-                    {symbol}
-                    {currency === "EUR" ? 50 : 25000}
-                  </b>{" "}
-                  covers a senior's medical visits
-                </li>
-                <li>
-                  •{" "}
-                  <b>
-                    {symbol}
-                    {currency === "EUR" ? 250 : 100000}
-                  </b>{" "}
-                  launches a woman's micro-business
-                </li>
+                {donationConfig
+                  ?.filter((c) => c.currency === currency)
+                  .slice(0, 4)
+                  .map((c) => (
+                    <li key={c.id}>
+                      •{" "}
+                      <b>
+                        {symbol}
+                        {Number(c.amount).toLocaleString()}
+                      </b>{" "}
+                      {c.description}
+                    </li>
+                  )) || (
+                    <>
+                      <li>• {symbol}25 feeds a child for a month</li>
+                      <li>• {symbol}50 covers a senior's medical visits</li>
+                      <li>• {symbol}250 launches a woman's micro-business</li>
+                    </>
+                  )}
               </ul>
             </div>
             <div className="rounded-3xl border border-border p-6 bg-card">

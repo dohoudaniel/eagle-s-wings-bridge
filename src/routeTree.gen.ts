@@ -18,6 +18,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProgramsIndexRouteImport } from './routes/programs.index'
+import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
 import { Route as ProgramsMotherlessHomeRouteImport } from './routes/programs.motherless-home'
 import { Route as ProgramsEmpowermentRouteImport } from './routes/programs.empowerment'
 import { Route as ProgramsElderlyCareRouteImport } from './routes/programs.elderly-care'
@@ -68,6 +69,11 @@ const ProgramsIndexRoute = ProgramsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProgramsRoute,
 } as any)
+const StoriesSlugRoute = StoriesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => StoriesRoute,
+} as any)
 const ProgramsMotherlessHomeRoute = ProgramsMotherlessHomeRouteImport.update({
   id: '/motherless-home',
   path: '/motherless-home',
@@ -96,12 +102,13 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRouteWithChildren
   '/programs': typeof ProgramsRouteWithChildren
-  '/stories': typeof StoriesRoute
+  '/stories': typeof StoriesRouteWithChildren
   '/volunteer': typeof VolunteerRoute
   '/donate/verify': typeof DonateVerifyRoute
   '/programs/elderly-care': typeof ProgramsElderlyCareRoute
   '/programs/empowerment': typeof ProgramsEmpowermentRoute
   '/programs/motherless-home': typeof ProgramsMotherlessHomeRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/programs/': typeof ProgramsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -110,12 +117,13 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRouteWithChildren
-  '/stories': typeof StoriesRoute
+  '/stories': typeof StoriesRouteWithChildren
   '/volunteer': typeof VolunteerRoute
   '/donate/verify': typeof DonateVerifyRoute
   '/programs/elderly-care': typeof ProgramsElderlyCareRoute
   '/programs/empowerment': typeof ProgramsEmpowermentRoute
   '/programs/motherless-home': typeof ProgramsMotherlessHomeRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/programs': typeof ProgramsIndexRoute
 }
 export interface FileRoutesById {
@@ -126,12 +134,13 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRouteWithChildren
   '/programs': typeof ProgramsRouteWithChildren
-  '/stories': typeof StoriesRoute
+  '/stories': typeof StoriesRouteWithChildren
   '/volunteer': typeof VolunteerRoute
   '/donate/verify': typeof DonateVerifyRoute
   '/programs/elderly-care': typeof ProgramsElderlyCareRoute
   '/programs/empowerment': typeof ProgramsEmpowermentRoute
   '/programs/motherless-home': typeof ProgramsMotherlessHomeRoute
+  '/stories/$slug': typeof StoriesSlugRoute
   '/programs/': typeof ProgramsIndexRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/programs/elderly-care'
     | '/programs/empowerment'
     | '/programs/motherless-home'
+    | '/stories/$slug'
     | '/programs/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/programs/elderly-care'
     | '/programs/empowerment'
     | '/programs/motherless-home'
+    | '/stories/$slug'
     | '/programs'
   id:
     | '__root__'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/programs/elderly-care'
     | '/programs/empowerment'
     | '/programs/motherless-home'
+    | '/stories/$slug'
     | '/programs/'
   fileRoutesById: FileRoutesById
 }
@@ -188,7 +200,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRouteWithChildren
   ProgramsRoute: typeof ProgramsRouteWithChildren
-  StoriesRoute: typeof StoriesRoute
+  StoriesRoute: typeof StoriesRouteWithChildren
   VolunteerRoute: typeof VolunteerRoute
 }
 
@@ -257,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgramsIndexRouteImport
       parentRoute: typeof ProgramsRoute
     }
+    '/stories/$slug': {
+      id: '/stories/$slug'
+      path: '/$slug'
+      fullPath: '/stories/$slug'
+      preLoaderRoute: typeof StoriesSlugRouteImport
+      parentRoute: typeof StoriesRoute
+    }
     '/programs/motherless-home': {
       id: '/programs/motherless-home'
       path: '/motherless-home'
@@ -317,6 +336,17 @@ const ProgramsRouteWithChildren = ProgramsRoute._addFileChildren(
   ProgramsRouteChildren,
 )
 
+interface StoriesRouteChildren {
+  StoriesSlugRoute: typeof StoriesSlugRoute
+}
+
+const StoriesRouteChildren: StoriesRouteChildren = {
+  StoriesSlugRoute: StoriesSlugRoute,
+}
+
+const StoriesRouteWithChildren =
+  StoriesRoute._addFileChildren(StoriesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -324,7 +354,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DonateRoute: DonateRouteWithChildren,
   ProgramsRoute: ProgramsRouteWithChildren,
-  StoriesRoute: StoriesRoute,
+  StoriesRoute: StoriesRouteWithChildren,
   VolunteerRoute: VolunteerRoute,
 }
 export const routeTree = rootRouteImport

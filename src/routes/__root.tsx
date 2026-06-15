@@ -1,6 +1,10 @@
+import { useEffect } from "react";
 import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { api } from "@/lib/api";
+import { SiteSettingsProvider } from "@/lib/site-settings";
 
 import appCss from "../styles.css?url";
 
@@ -74,15 +78,27 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const status = useRouterState({ select: (s) => s.status });
   const isAdmin = pathname.startsWith("/admin");
+  const isLoading = status === "pending";
+
+  useEffect(() => {
+    if (typeof document === "undefined" || isAdmin) return;
+    api.trackPageView(pathname, document.referrer).catch(() => {});
+  }, [pathname, isAdmin]);
 
   return (
     <div className="min-h-screen flex flex-col">
-      {!isAdmin && <Navbar />}
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      {!isAdmin && <Footer />}
+      {isLoading && (
+        <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-primary/20">
+          <div className="h-full w-1/3 bg-primary animate-[loading_1s_ease-in-out_infinite]" />
+        </div>
+      )}
+      <SiteSettingsProvider>
+        {!isAdmin && <Navbar />}
+        <main className="flex-1">{isLoading ? <LoadingSpinner message="Loading page..." /> : <Outlet />}</main>
+        {!isAdmin && <Footer />}
+      </SiteSettingsProvider>
     </div>
   );
 }

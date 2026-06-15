@@ -183,3 +183,12 @@
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
 }
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}

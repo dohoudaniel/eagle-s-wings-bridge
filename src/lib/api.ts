@@ -6,6 +6,7 @@ import type {
   Program,
   SiteSetting,
   Story,
+  TeamMember,
   Testimonial,
   TimelineEvent,
 } from "./types";
@@ -13,9 +14,13 @@ import type {
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
 async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
+  const isFormData = options?.body instanceof FormData;
   const response = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...options?.headers },
     ...options,
+    headers: {
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...options?.headers,
+    },
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -35,7 +40,11 @@ export const api = {
   getTimeline: () => fetchJson<TimelineEvent[]>("/timeline"),
   getImpactStats: () => fetchJson<ImpactStat[]>("/impact-stats"),
   getSiteSettings: () => fetchJson<SiteSetting[]>("/site-settings"),
+  getSiteSettingsByGroup: (group: string) => fetchJson<SiteSetting[]>(`/site-settings/group/${encodeURIComponent(group)}`),
   getDonationConfig: () => fetchJson<DonationConfig[]>("/donation-config"),
+  getTeamMembers: () => fetchJson<TeamMember[]>("/team-members"),
+  trackPageView: (path: string, referrer?: string) =>
+    fetchJson<void>("/page-views", { method: "POST", body: JSON.stringify({ path, referrer }) }),
 
   // Forms
   submitContact: (body: { name: string; email: string; phone?: string; message: string }) =>
