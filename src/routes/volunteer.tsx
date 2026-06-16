@@ -52,7 +52,11 @@ function VolunteerPage() {
     }
 
     try {
-      await api.submitVolunteer(formData);
+      const res = await api.submitVolunteer(formData);
+      if (res?.success === false) {
+        setError(res.message || "We couldn't submit your application. Please try again.");
+        return;
+      }
       setDone(true);
       form.reset();
       setCvName(null);

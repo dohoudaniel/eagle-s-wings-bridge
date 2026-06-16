@@ -85,14 +85,16 @@ export const adminApi = {
 
   // Programs
   listPrograms: () => fetchJson<Program[]>("/admin/programs"),
-  createProgram: (body: Record<string, unknown>) => fetchJson<Program>("/admin/programs", { method: "POST", body: JSON.stringify(body) }),
+  createProgram: (body: Record<string, unknown>) =>
+    fetchJson<Program>("/admin/programs", { method: "POST", body: JSON.stringify(body) }),
   updateProgram: (id: string, body: Record<string, unknown>) =>
     fetchJson<Program>(`/admin/programs/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
   deleteProgram: (id: string) => fetchJson<void>(`/admin/programs/${id}`, { method: "DELETE" }),
 
   // Stories
   listStories: () => fetchJson<Story[]>("/admin/stories"),
-  createStory: (body: Record<string, unknown>) => fetchJson<Story>("/admin/stories", { method: "POST", body: JSON.stringify(body) }),
+  createStory: (body: Record<string, unknown>) =>
+    fetchJson<Story>("/admin/stories", { method: "POST", body: JSON.stringify(body) }),
   updateStory: (id: string, body: Record<string, unknown>) =>
     fetchJson<Story>(`/admin/stories/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
   deleteStory: (id: string) => fetchJson<void>(`/admin/stories/${id}`, { method: "DELETE" }),
@@ -102,76 +104,121 @@ export const adminApi = {
   createTestimonial: (body: Record<string, unknown>) =>
     fetchJson<Testimonial>("/admin/testimonials", { method: "POST", body: JSON.stringify(body) }),
   updateTestimonial: (id: string, body: Record<string, unknown>) =>
-    fetchJson<Testimonial>(`/admin/testimonials/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteTestimonial: (id: string) => fetchJson<void>(`/admin/testimonials/${id}`, { method: "DELETE" }),
+    fetchJson<Testimonial>(`/admin/testimonials/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteTestimonial: (id: string) =>
+    fetchJson<void>(`/admin/testimonials/${id}`, { method: "DELETE" }),
 
   // Hero slides
   listHeroSlides: () => fetchJson<HeroSlide[]>("/admin/hero-slides"),
   createHeroSlide: (body: Record<string, unknown>) =>
     fetchJson<HeroSlide>("/admin/hero-slides", { method: "POST", body: JSON.stringify(body) }),
   updateHeroSlide: (id: string, body: Record<string, unknown>) =>
-    fetchJson<HeroSlide>(`/admin/hero-slides/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteHeroSlide: (id: string) => fetchJson<void>(`/admin/hero-slides/${id}`, { method: "DELETE" }),
+    fetchJson<HeroSlide>(`/admin/hero-slides/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteHeroSlide: (id: string) =>
+    fetchJson<void>(`/admin/hero-slides/${id}`, { method: "DELETE" }),
 
   // Timeline
   listTimeline: () => fetchJson<TimelineEvent[]>("/admin/timeline"),
   createTimelineEvent: (body: Record<string, unknown>) =>
     fetchJson<TimelineEvent>("/admin/timeline", { method: "POST", body: JSON.stringify(body) }),
   updateTimelineEvent: (id: string, body: Record<string, unknown>) =>
-    fetchJson<TimelineEvent>(`/admin/timeline/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteTimelineEvent: (id: string) => fetchJson<void>(`/admin/timeline/${id}`, { method: "DELETE" }),
+    fetchJson<TimelineEvent>(`/admin/timeline/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteTimelineEvent: (id: string) =>
+    fetchJson<void>(`/admin/timeline/${id}`, { method: "DELETE" }),
 
   // Impact stats
   listImpactStats: () => fetchJson<ImpactStat[]>("/admin/impact-stats"),
   createImpactStat: (body: Record<string, unknown>) =>
     fetchJson<ImpactStat>("/admin/impact-stats", { method: "POST", body: JSON.stringify(body) }),
   updateImpactStat: (id: string, body: Record<string, unknown>) =>
-    fetchJson<ImpactStat>(`/admin/impact-stats/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteImpactStat: (id: string) => fetchJson<void>(`/admin/impact-stats/${id}`, { method: "DELETE" }),
+    fetchJson<ImpactStat>(`/admin/impact-stats/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteImpactStat: (id: string) =>
+    fetchJson<void>(`/admin/impact-stats/${id}`, { method: "DELETE" }),
 
   // Site settings
   listSiteSettings: () => fetchJson<SiteSetting[]>("/admin/site-settings"),
   createSiteSetting: (body: Record<string, unknown>) =>
     fetchJson<SiteSetting>("/admin/site-settings", { method: "POST", body: JSON.stringify(body) }),
   updateSiteSetting: (key: string, body: Record<string, unknown>) =>
-    fetchJson<SiteSetting>(`/admin/site-settings/${key}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteSiteSetting: (key: string) => fetchJson<void>(`/admin/site-settings/${key}`, { method: "DELETE" }),
+    fetchJson<SiteSetting>(`/admin/site-settings/${key}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteSiteSetting: (key: string) =>
+    fetchJson<void>(`/admin/site-settings/${key}`, { method: "DELETE" }),
 
   // Donation config
   listDonationConfigs: () => fetchJson<DonationConfig[]>("/admin/donation-config"),
   createDonationConfig: (body: Record<string, unknown>) =>
-    fetchJson<DonationConfig>("/admin/donation-config", { method: "POST", body: JSON.stringify(body) }),
+    fetchJson<DonationConfig>("/admin/donation-config", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
   updateDonationConfig: (id: string, body: Record<string, unknown>) =>
-    fetchJson<DonationConfig>(`/admin/donation-config/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteDonationConfig: (id: string) => fetchJson<void>(`/admin/donation-config/${id}`, { method: "DELETE" }),
+    fetchJson<DonationConfig>(`/admin/donation-config/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteDonationConfig: (id: string) =>
+    fetchJson<void>(`/admin/donation-config/${id}`, { method: "DELETE" }),
 
   // Submissions
   listContacts: () => fetchJson<ContactSubmission[]>("/admin/contacts"),
   updateContactStatus: (id: string, status: string) =>
-    fetchJson<ContactSubmission>(`/admin/contacts/${id}/status?status_value=${encodeURIComponent(status)}`, { method: "PATCH" }),
+    fetchJson<ContactSubmission>(
+      `/admin/contacts/${id}/status?status_value=${encodeURIComponent(status)}`,
+      { method: "PATCH" },
+    ),
   updateContactNotes: (id: string, notes: string) => {
     const formData = new FormData();
     formData.append("notes", notes);
-    return fetchJson<ContactSubmission>(`/admin/contacts/${id}/notes`, { method: "PATCH", body: formData });
+    return fetchJson<ContactSubmission>(`/admin/contacts/${id}/notes`, {
+      method: "PATCH",
+      body: formData,
+    });
   },
   listVolunteers: () => fetchJson<VolunteerSubmission[]>("/admin/volunteers"),
   updateVolunteerStatus: (id: string, status: string) =>
-    fetchJson<VolunteerSubmission>(`/admin/volunteers/${id}/status?status_value=${encodeURIComponent(status)}`, { method: "PATCH" }),
+    fetchJson<VolunteerSubmission>(
+      `/admin/volunteers/${id}/status?status_value=${encodeURIComponent(status)}`,
+      { method: "PATCH" },
+    ),
   updateVolunteerNotes: (id: string, notes: string) => {
     const formData = new FormData();
     formData.append("notes", notes);
-    return fetchJson<VolunteerSubmission>(`/admin/volunteers/${id}/notes`, { method: "PATCH", body: formData });
+    return fetchJson<VolunteerSubmission>(`/admin/volunteers/${id}/notes`, {
+      method: "PATCH",
+      body: formData,
+    });
   },
-  getVolunteerCvUrl: (id: string) => fetchJson<{ signed_url: string }>(`/admin/volunteers/${id}/cv-url`),
-  listNewsletterSubscribers: () => fetchJson<NewsletterSubscriber[]>("/admin/newsletter-subscribers"),
+  getVolunteerCvUrl: (id: string) =>
+    fetchJson<{ signed_url: string }>(`/admin/volunteers/${id}/cv-url`),
+  listNewsletterSubscribers: () =>
+    fetchJson<NewsletterSubscriber[]>("/admin/newsletter-subscribers"),
 
   // Team members
   listTeamMembers: () => fetchJson<TeamMember[]>("/admin/team-members"),
   createTeamMember: (body: Record<string, unknown>) =>
     fetchJson<TeamMember>("/admin/team-members", { method: "POST", body: JSON.stringify(body) }),
   updateTeamMember: (id: string, body: Record<string, unknown>) =>
-    fetchJson<TeamMember>(`/admin/team-members/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
-  deleteTeamMember: (id: string) => fetchJson<void>(`/admin/team-members/${id}`, { method: "DELETE" }),
+    fetchJson<TeamMember>(`/admin/team-members/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteTeamMember: (id: string) =>
+    fetchJson<void>(`/admin/team-members/${id}`, { method: "DELETE" }),
 
   // Donations
   listDonations: (params?: { status?: string; limit?: number; offset?: number }) => {
@@ -182,7 +229,8 @@ export const adminApi = {
     const qs = query.toString();
     return fetchJson<Donation[]>(`/admin/donations${qs ? `?${qs}` : ""}`);
   },
-  getDonationStats: () => fetchJson<{ total: number; completed: number; total_amount: number }>("/admin/donations/stats"),
+  getDonationStats: () =>
+    fetchJson<{ total: number; completed: number; total_amount: number }>("/admin/donations/stats"),
 
   // Dashboard
   getDashboard: () =>
@@ -219,8 +267,12 @@ export const adminApi = {
       body: formData,
     });
   },
-  deleteImage: (url: string) => fetchJson<void>(`/admin/storage/images?url=${encodeURIComponent(url)}`, { method: "DELETE" }),
-  listImages: (folder = "cms") => fetchJson<{ images: { name: string; path: string; url: string; size: number; created_at: string }[] }>(`/admin/storage/images?folder=${encodeURIComponent(folder)}`),
+  deleteImage: (url: string) =>
+    fetchJson<void>(`/admin/storage/images?url=${encodeURIComponent(url)}`, { method: "DELETE" }),
+  listImages: (folder = "cms") =>
+    fetchJson<{
+      images: { name: string; path: string; url: string; size: number; created_at: string }[];
+    }>(`/admin/storage/images?folder=${encodeURIComponent(folder)}`),
 };
 
 export interface AdminAction {
@@ -241,7 +293,10 @@ export interface ContactSubmission {
   email: string;
   phone: string | null;
   message: string;
+  notes: string | null;
   status: "new" | "replied" | "spam" | "archived";
+  ip_address: string | null;
+  user_agent: string | null;
   created_at: string;
 }
 
@@ -252,9 +307,12 @@ export interface VolunteerSubmission {
   phone: string | null;
   area_of_interest: string;
   message: string | null;
+  notes: string | null;
   cv_url: string;
   cv_filename: string;
   status: "new" | "reviewing" | "accepted" | "rejected";
+  ip_address: string | null;
+  user_agent: string | null;
   created_at: string;
 }
 
@@ -262,5 +320,7 @@ export interface NewsletterSubscriber {
   id: string;
   email: string;
   is_active: boolean;
+  source: string | null;
   subscribed_at: string;
+  unsubscribed_at: string | null;
 }

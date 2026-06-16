@@ -35,13 +35,17 @@ function ContactPage() {
 
     const formData = new FormData(e.currentTarget);
     try {
-      await api.submitContact({
+      const res = await api.submitContact({
         name: String(formData.get("name")),
         email: String(formData.get("email")),
         phone: formData.get("phone") ? String(formData.get("phone")) : undefined,
         message: String(formData.get("message")),
       });
-      setDone(true);
+      if (res?.success === false) {
+        setError(res.message || "We couldn't send your message. Please try again.");
+      } else {
+        setDone(true);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -54,7 +58,10 @@ function ContactPage() {
       <PageHeader
         eyebrow={getValue("contact_eyebrow", "Contact")}
         title={getValue("contact_title", "Let's talk.")}
-        description={getValue("contact_description", "Questions, partnerships, press — we read every message.")}
+        description={getValue(
+          "contact_description",
+          "Questions, partnerships, press — we read every message.",
+        )}
       />
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-[1.2fr_1fr] gap-10 max-w-6xl">
@@ -132,7 +139,11 @@ function ContactPage() {
                 title: "Visit us",
                 lines: getValue("contact_address", "Lagos, Nigeria · Berlin, Germany").split(" · "),
               },
-              { icon: Mail, title: "Email", lines: [getValue("contact_email", "hello@eagleswings.org")] },
+              {
+                icon: Mail,
+                title: "Email",
+                lines: [getValue("contact_email", "hello@eagleswings.org")],
+              },
               {
                 icon: Phone,
                 title: "Call",

@@ -16,9 +16,11 @@ export function ProgramDetail({ slug }: { slug: string }) {
     return <LoadingSpinner message="Loading program..." />;
   }
 
+  // Prefer live data, fall back to bundled content — so a transient API error on
+  // a valid slug still renders the fallback instead of a hard "not found".
   const displayProgram = program || fallback;
 
-  if (error || !displayProgram) {
+  if (!displayProgram) {
     return (
       <section className="py-20 lg:py-28 text-center">
         <div className="container mx-auto px-4">

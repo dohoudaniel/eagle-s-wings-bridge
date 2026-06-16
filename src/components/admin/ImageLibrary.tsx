@@ -9,7 +9,9 @@ interface ImageLibraryProps {
 }
 
 export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
-  const [images, setImages] = useState<{ name: string; path: string; url: string; size: number; created_at: string }[]>([]);
+  const [images, setImages] = useState<
+    { name: string; path: string; url: string; size: number; created_at: string }[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
@@ -18,7 +20,7 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
     setLoading(true);
     try {
       const data = await adminApi.listImages("cms");
-      setImages(data.images);
+      setImages(Array.isArray(data?.images) ? data.images : []);
     } catch (err) {
       onError(err instanceof Error ? err.message : "Failed to load images");
     } finally {
@@ -75,9 +77,13 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
     }
   }
 
-  function copyUrl(url: string) {
-    navigator.clipboard.writeText(url);
-    onSuccess("URL copied to clipboard");
+  async function copyUrl(url: string) {
+    try {
+      await navigator.clipboard.writeText(url);
+      onSuccess("URL copied to clipboard");
+    } catch {
+      onError("Could not copy URL. Copy it manually.");
+    }
   }
 
   function formatBytes(bytes: number) {
@@ -94,14 +100,34 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
         <h2 className="text-2xl font-bold text-slate-900">Media Library</h2>
         <div className="flex items-center gap-3">
           <label className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition cursor-pointer disabled:opacity-60">
-            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
             <span>{uploading ? "Uploading..." : "Upload image"}</span>
-            <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleUpload}
+              disabled={uploading}
+            />
           </label>
           <label className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition cursor-pointer disabled:opacity-60">
-            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
             <span>{uploading ? "Uploading..." : "Upload video"}</span>
-            <input type="file" accept="video/*" className="hidden" onChange={handleVideoUpload} disabled={uploading} />
+            <input
+              type="file"
+              accept="video/*"
+              className="hidden"
+              onChange={handleVideoUpload}
+              disabled={uploading}
+            />
           </label>
         </div>
       </div>
@@ -113,7 +139,9 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
       ) : images.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-16 text-center">
           <p className="text-slate-500">No images uploaded yet.</p>
-          <p className="text-sm text-slate-400 mt-1">Upload images to use them in programs, stories, and hero slides.</p>
+          <p className="text-sm text-slate-400 mt-1">
+            Upload images to use them in programs, stories, and hero slides.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

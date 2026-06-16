@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -12,7 +13,8 @@ export const Route = createFileRoute("/stories/$slug")({
 
 function StoryDetailPage() {
   const { slug } = Route.useParams();
-  const { data: story, loading } = useApi(() => api.getStory(slug));
+  const fetcher = useMemo(() => () => api.getStory(slug), [slug]);
+  const { data: story, loading } = useApi(fetcher);
   const fallback = fallbackStories.find((s) => s.slug === slug);
   const content = story || fallback;
 
@@ -46,18 +48,28 @@ function StoryDetailPage() {
 
         {content.image_url ? (
           <div className="aspect-[16/9] rounded-3xl overflow-hidden mb-10">
-            <img src={content.image_url} alt={content.title} className="h-full w-full object-cover" />
+            <img
+              src={content.image_url}
+              alt={content.title}
+              className="h-full w-full object-cover"
+            />
           </div>
         ) : null}
 
         <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
-          {content.author_name ? <span className="font-medium text-primary">{content.author_name}</span> : null}
+          {content.author_name ? (
+            <span className="font-medium text-primary">{content.author_name}</span>
+          ) : null}
           {content.published_at ? (
-            <span>{new Date(content.published_at).toLocaleDateString(undefined, { dateStyle: "long" })}</span>
+            <span>
+              {new Date(content.published_at).toLocaleDateString(undefined, { dateStyle: "long" })}
+            </span>
           ) : null}
         </div>
 
-        <h1 className="text-3xl lg:text-5xl font-bold font-display leading-tight">{content.title}</h1>
+        <h1 className="text-3xl lg:text-5xl font-bold font-display leading-tight">
+          {content.title}
+        </h1>
         <p className="mt-6 text-xl text-muted-foreground leading-relaxed">{content.excerpt}</p>
 
         <div className="mt-10 prose prose-lg max-w-none text-slate-700 leading-relaxed whitespace-pre-wrap">
