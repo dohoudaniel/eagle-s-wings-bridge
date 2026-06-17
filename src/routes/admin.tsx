@@ -9,6 +9,7 @@ import { SubmissionManager } from "@/components/admin/SubmissionManager";
 import { ToastContainer } from "@/components/admin/Toast";
 import {
   adminApi,
+  CSRF_STORAGE_KEY,
   type ContactSubmission,
   type Donation,
   type NewsletterSubscriber,
@@ -109,8 +110,15 @@ const teamMemberFields: FieldConfig[] = [
 ];
 
 function hasAdminSession() {
-  if (typeof document === "undefined") return false;
-  return /(?:^|; )csrf_token=/.test(document.cookie);
+  // The backend's csrf_token cookie lives on a different domain and isn't readable
+  // here, so we key "logged in" off the CSRF token persisted in localStorage. An
+  // expired session self-corrects: the first API call 401s and clears it.
+  if (typeof window === "undefined") return false;
+  try {
+    return !!window.localStorage.getItem(CSRF_STORAGE_KEY);
+  } catch {
+    return false;
+  }
 }
 
 function AdminPage() {

@@ -14,21 +14,36 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
-function getCsrfTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|; )csrf_token=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+// The CSRF token is persisted in localStorage (on the frontend origin) so the
+// admin session survives a refresh. The backend lives on a different domain, so
+// its csrf_token cookie is not readable here — but that cookie still rides along
+// on cross-site requests and matches this token, keeping double-submit CSRF valid.
+export const CSRF_STORAGE_KEY = "ew_admin_csrf";
+
+function readStoredCsrf(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(CSRF_STORAGE_KEY);
+  } catch {
+    return null;
+  }
 }
 
-let _csrfToken: string | null = null;
+let _csrfToken: string | null = readStoredCsrf();
 
 function getCsrfToken(): string | null {
-  // Refresh from cookie in case it changed (e.g. after login in another tab).
-  return _csrfToken || getCsrfTokenFromCookie();
+  return _csrfToken || readStoredCsrf();
 }
 
 function setCsrfToken(token: string | null) {
   _csrfToken = token;
+  if (typeof window === "undefined") return;
+  try {
+    if (token) window.localStorage.setItem(CSRF_STORAGE_KEY, token);
+    else window.localStorage.removeItem(CSRF_STORAGE_KEY);
+  } catch {
+    // ignore storage failures (private mode, etc.)
+  }
 }
 
 async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
@@ -81,7 +96,13 @@ export const adminApi = {
     setCsrfToken(data.csrf_token);
     return data;
   },
-  logout: () => fetchJson<void>("/admin/logout", { method: "POST" }),
+  logout: async () => {
+    try {
+      await fetchJson<void>("/admin/logout", { method: "POST" });
+    } finally {
+      setCsrfToken(null);
+    }
+  },
 
   // Programs
   listPrograms: () => fetchJson<Program[]>("/admin/programs"),
