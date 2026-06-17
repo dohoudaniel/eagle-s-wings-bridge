@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dashboard } from "@/components/admin/Dashboard";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ImageLibrary } from "@/components/admin/ImageLibrary";
 import { LoginForm } from "@/components/admin/LoginForm";
 import { ResourceManager, type FieldConfig } from "@/components/admin/ResourceManager";
@@ -122,9 +123,17 @@ function hasAdminSession() {
 }
 
 function AdminPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(hasAdminSession());
+  // Resolve auth only after mount: the server has no localStorage, so reading it
+  // during SSR/first render would flash the login page before the dashboard.
+  const [mounted, setMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
   const { toasts, addToast, removeToast } = useToast();
+
+  useEffect(() => {
+    setIsLoggedIn(hasAdminSession());
+    setMounted(true);
+  }, []);
 
   const handleLogin = () => setIsLoggedIn(true);
   const handleLogout = async () => {
@@ -498,7 +507,11 @@ function AdminPage() {
     }
   }, [activeTab, addToast]);
 
-  const body = !isLoggedIn ? (
+  const body = !mounted ? (
+    <div className="flex min-h-screen items-center justify-center bg-muted/40">
+      <LoadingSpinner message="Loading admin..." />
+    </div>
+  ) : !isLoggedIn ? (
     <>
       <LoginForm onLogin={handleLogin} />
       <ToastContainer toasts={toasts} onRemove={removeToast} />
