@@ -1,7 +1,7 @@
 import handler from "../dist/server/server.js";
 
 export const config = {
-  runtime: "edge",
+  runtime: "nodejs20.x",
 };
 
 export default async function (request) {
