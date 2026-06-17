@@ -24,28 +24,28 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal title={title} isOpen={isOpen} onClose={onCancel}>
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-start gap-4">
-          <div className="p-2 bg-red-100 rounded-full shrink-0">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
+          <div className="shrink-0 rounded-full bg-destructive/10 p-2.5">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
           </div>
-          <p className="text-sm text-slate-600 leading-relaxed">{message}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{message}</p>
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition"
+            className="rounded-xl px-4 py-2 font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg font-medium text-white transition ${
+            className={`rounded-xl px-4 py-2 font-medium shadow-soft transition ${
               variant === "danger"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-primary hover:bg-primary/90"
+                ? "bg-destructive text-white hover:bg-destructive/90"
+                : "bg-gradient-primary text-primary-foreground hover:shadow-glow"
             }`}
           >
             {confirmLabel}

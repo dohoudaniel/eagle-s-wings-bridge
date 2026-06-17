@@ -7,8 +7,15 @@ import { ResourceManager, type FieldConfig } from "@/components/admin/ResourceMa
 import { Sidebar, type AdminTab } from "@/components/admin/Sidebar";
 import { SubmissionManager } from "@/components/admin/SubmissionManager";
 import { ToastContainer } from "@/components/admin/Toast";
-import { adminApi, type ContactSubmission, type Donation, type NewsletterSubscriber, type VolunteerSubmission } from "@/lib/admin-api";
+import {
+  adminApi,
+  type ContactSubmission,
+  type Donation,
+  type NewsletterSubscriber,
+  type VolunteerSubmission,
+} from "@/lib/admin-api";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeProvider } from "@/lib/theme";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -151,7 +158,9 @@ function AdminPage() {
                 render: (item) => (
                   <span
                     className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                      item.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"
+                      item.is_active
+                        ? "bg-success/15 text-success"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {item.is_active ? "Active" : "Inactive"}
@@ -181,7 +190,9 @@ function AdminPage() {
                 render: (item) => (
                   <span
                     className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                      item.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"
+                      item.is_active
+                        ? "bg-success/15 text-success"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {item.is_active ? "Active" : "Inactive"}
@@ -272,7 +283,15 @@ function AdminPage() {
             remove={(key) => adminApi.deleteSiteSetting(key)}
             columns={[
               { key: "key", header: "Key" },
-              { key: "value", header: "Value", render: (item) => <span className="truncate max-w-xs block">{(item as { value: string }).value}</span> },
+              {
+                key: "value",
+                header: "Value",
+                render: (item) => (
+                  <span className="truncate max-w-xs block">
+                    {(item as { value: string }).value}
+                  </span>
+                ),
+              },
               { key: "group", header: "Group" },
             ]}
             {...props}
@@ -398,7 +417,9 @@ function AdminPage() {
                 render: (item) => (
                   <span
                     className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                      item.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"
+                      item.is_active
+                        ? "bg-success/15 text-success"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {item.is_active ? "Active" : "Inactive"}
@@ -436,7 +457,11 @@ function AdminPage() {
             columns={[
               { key: "donor_name", header: "Donor" },
               { key: "donor_email", header: "Email" },
-              { key: "amount", header: "Amount", render: (item) => `${item.amount} ${item.currency}` },
+              {
+                key: "amount",
+                header: "Amount",
+                render: (item) => `${item.amount} ${item.currency}`,
+              },
               { key: "frequency", header: "Frequency" },
               {
                 key: "status",
@@ -445,10 +470,10 @@ function AdminPage() {
                   <span
                     className={`inline-flex px-2 py-1 rounded-full text-xs font-medium capitalize ${
                       item.status === "completed"
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-success/15 text-success"
                         : item.status === "pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-red-100 text-red-700"
+                          ? "bg-warm/20 text-warm-foreground"
+                          : "bg-destructive/15 text-destructive"
                     }`}
                   >
                     {item.status}
@@ -465,22 +490,20 @@ function AdminPage() {
     }
   }, [activeTab, addToast]);
 
-  if (!isLoggedIn) {
-    return (
-      <>
-        <LoginForm onLogin={handleLogin} />
-        <ToastContainer toasts={toasts} onRemove={removeToast} />
-      </>
-    );
-  }
-
-  return (
-    <div className="flex min-h-screen bg-slate-50">
+  const body = !isLoggedIn ? (
+    <>
+      <LoginForm onLogin={handleLogin} />
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </>
+  ) : (
+    <div className="flex min-h-screen bg-muted/40">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} />
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-6xl mx-auto">{content}</div>
+      <main className="flex-1 overflow-y-auto p-6 lg:p-10">
+        <div className="mx-auto max-w-6xl">{content}</div>
       </main>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
+
+  return <ThemeProvider>{body}</ThemeProvider>;
 }

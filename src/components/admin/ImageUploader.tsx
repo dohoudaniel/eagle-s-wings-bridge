@@ -109,7 +109,8 @@ export function ImageUploader({
       </div>
 
       <p className="text-sm text-slate-500">
-        Uploaded images are stored in the public Supabase Storage bucket and can be referenced by URL in content fields.
+        Uploaded images are stored in the public Supabase Storage bucket and can be referenced by
+        URL in content fields.
       </p>
     </div>
   );

@@ -1,10 +1,18 @@
-import { useEffect } from "react";
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import {
+  Outlet,
+  Link,
+  createRootRoute,
+  HeadContent,
+  Scripts,
+  useRouterState,
+} from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { api } from "@/lib/api";
 import { SiteSettingsProvider } from "@/lib/site-settings";
+import { themeInitScript } from "@/lib/theme";
 
 import appCss from "../styles.css?url";
 
@@ -50,6 +58,9 @@ export const Route = createRootRoute({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "stylesheet", href: appCss },
       {
         rel: "stylesheet",
@@ -64,11 +75,16 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Set theme class before paint to avoid a flash of the wrong theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <HeadContent />
       </head>
-      <body>
+      {/* suppressHydrationWarning: browser extensions (Grammarly, etc.) inject
+          attributes like data-gr-ext-installed onto <body> before React
+          hydrates. This only silences <body>'s own attribute diffs. */}
+      <body suppressHydrationWarning>
         {children}
         <Scripts />
       </body>
@@ -80,7 +96,13 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const status = useRouterState({ select: (s) => s.status });
   const isAdmin = pathname.startsWith("/admin");
-  const isLoading = status === "pending";
+  // Gate loading UI behind client mount: the server always renders the
+  // non-loading tree, so initial client render matches it (no hydration
+  // mismatch). The loading bar/spinner only appear on client-side navigation.
+  const [mounted, setMounted] = useState(false);
+  const isLoading = mounted && status === "pending";
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (typeof document === "undefined" || isAdmin) return;
@@ -96,7 +118,9 @@ function RootComponent() {
       )}
       <SiteSettingsProvider>
         {!isAdmin && <Navbar />}
-        <main className="flex-1">{isLoading ? <LoadingSpinner message="Loading page..." /> : <Outlet />}</main>
+        <main className="flex-1">
+          {isLoading ? <LoadingSpinner message="Loading page..." /> : <Outlet />}
+        </main>
         {!isAdmin && <Footer />}
       </SiteSettingsProvider>
     </div>

@@ -9,10 +9,13 @@ import {
   LogOut,
   Mail,
   Megaphone,
+  Moon,
   Settings,
+  Sun,
   Users,
   UsersRound,
 } from "lucide-react";
+import { useTheme } from "@/lib/theme";
 
 export type AdminTab =
   | "dashboard"
@@ -59,47 +62,78 @@ export function Sidebar({
   onTabChange: (tab: AdminTab) => void;
   onLogout: () => void;
 }) {
-  function NavItem({ id, label, icon: Icon }: { id: AdminTab; label: string; icon: React.ElementType }) {
+  function NavItem({
+    id,
+    label,
+    icon: Icon,
+  }: {
+    id: AdminTab;
+    label: string;
+    icon: React.ElementType;
+  }) {
     const active = activeTab === id;
     return (
       <button
         type="button"
         onClick={() => onTabChange(id)}
-        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
+        className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
           active
-            ? "bg-primary text-primary-foreground"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+            ? "bg-gradient-primary text-primary-foreground shadow-soft"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
         }`}
       >
-        <Icon className="h-4 w-4" />
+        <Icon className="h-4 w-4 shrink-0" />
         {label}
       </button>
     );
   }
 
+  function SectionLabel({ children }: { children: React.ReactNode }) {
+    return (
+      <div className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+        {children}
+      </div>
+    );
+  }
+
+  function ThemeRow() {
+    const { theme, toggle } = useTheme();
+    const isDark = theme === "dark";
+    return (
+      <button
+        type="button"
+        onClick={toggle}
+        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+      >
+        {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        {isDark ? "Light mode" : "Dark mode"}
+      </button>
+    );
+  }
+
   return (
-    <aside className="w-64 bg-slate-900 text-white flex flex-col h-screen sticky top-0">
-      <div className="p-6 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-primary grid place-items-center">
-            <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
-          </div>
-          <div>
-            <div className="font-bold">Eagle's Wings</div>
-            <div className="text-xs text-slate-400">Admin Panel</div>
-          </div>
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-border bg-card">
+      <div className="flex items-center gap-3 border-b border-border p-6">
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-primary shadow-soft">
+          <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
+        </div>
+        <div className="leading-tight">
+          <div className="font-display font-bold text-foreground">Eagle's Wings</div>
+          <div className="text-xs text-muted-foreground">Admin Panel</div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 space-y-6 overflow-y-auto p-4">
         <div>
-          <div className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Overview</div>
-          <NavItem id="dashboard" label="Dashboard" icon={LayoutDashboard} />
-          <NavItem id="storage" label="Image Library" icon={Image} />
+          <SectionLabel>Overview</SectionLabel>
+          <div className="space-y-1">
+            <NavItem id="dashboard" label="Dashboard" icon={LayoutDashboard} />
+            <NavItem id="storage" label="Media Library" icon={Image} />
+          </div>
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Content</div>
+          <SectionLabel>Content</SectionLabel>
           <div className="space-y-1">
             {contentItems.map((item) => (
               <NavItem key={item.id} {...item} />
@@ -108,7 +142,7 @@ export function Sidebar({
         </div>
 
         <div>
-          <div className="px-3 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Submissions</div>
+          <SectionLabel>Submissions</SectionLabel>
           <div className="space-y-1">
             {submissionItems.map((item) => (
               <NavItem key={item.id} {...item} />
@@ -117,11 +151,12 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="p-4 border-t border-slate-800">
+      <div className="space-y-1 border-t border-border p-4">
+        <ThemeRow />
         <button
           type="button"
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
         >
           <LogOut className="h-4 w-4" />
           Sign out

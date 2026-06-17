@@ -17,7 +17,9 @@ export function Hero() {
     return () => clearInterval(t);
   }, [slides]);
 
-  const slide = slides[i];
+  const slide = slides[i] ?? slides[0];
+
+  if (!slide) return null;
 
   return (
     <section className="relative min-h-[100svh] overflow-hidden bg-foreground">
@@ -43,7 +45,7 @@ export function Hero() {
         </div>
       ))}
 
-      <div className="relative container mx-auto px-4 lg:px-8 min-h-[100svh] flex items-center pt-20">
+      <div className="relative container mx-auto px-4 lg:px-8 min-h-[100svh] flex items-center pt-24 pb-44 lg:pb-56">
         <div className="max-w-2xl text-background animate-fade-up" key={i}>
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-background/10 backdrop-blur border border-background/20 text-xs uppercase tracking-widest font-semibold">
             <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
@@ -73,7 +75,7 @@ export function Hero() {
       </div>
 
       {slides.length > 1 ? (
-        <div className="absolute bottom-8 right-4 lg:right-8 flex items-center gap-3 z-10">
+        <div className="absolute bottom-28 lg:bottom-32 right-4 lg:right-8 flex items-center gap-3 z-10">
           <button
             type="button"
             onClick={() => setI((v) => (v - 1 + slides.length) % slides.length)}

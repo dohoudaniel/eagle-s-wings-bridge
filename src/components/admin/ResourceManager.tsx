@@ -136,12 +136,12 @@ export function ResourceManager<T>({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
+      <div className="mb-8 flex items-center justify-between">
+        <h2 className="font-display text-3xl font-bold text-foreground">{title}</h2>
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-primary px-4 py-2.5 font-medium text-primary-foreground shadow-soft transition hover:shadow-glow"
         >
           <Plus className="h-4 w-4" />
           Add new
@@ -174,20 +174,25 @@ export function ResourceManager<T>({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {fields.map((field) => (
-            <FormField key={field.name} field={field} value={formData[field.name] as string | boolean | number | null} onChange={handleChange} />
+            <FormField
+              key={field.name}
+              field={field}
+              value={formData[field.name] as string | boolean | number | null}
+              onChange={handleChange}
+            />
           ))}
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition"
+              className="rounded-xl px-4 py-2.5 font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition disabled:opacity-60"
+              className="rounded-xl bg-gradient-primary px-4 py-2.5 font-medium text-primary-foreground shadow-soft transition hover:shadow-glow disabled:opacity-60"
             >
               {saving ? "Saving..." : "Save"}
             </button>

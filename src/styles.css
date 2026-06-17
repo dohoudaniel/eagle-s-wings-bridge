@@ -101,6 +101,7 @@
 .dark {
   --background: oklch(0.14 0.03 250);
   --foreground: oklch(0.97 0.01 240);
+  --gradient-soft: linear-gradient(180deg, oklch(0.18 0.03 250), oklch(0.14 0.03 250));
   --card: oklch(0.18 0.035 250);
   --card-foreground: oklch(0.97 0.01 240);
   --popover: oklch(0.18 0.035 250);

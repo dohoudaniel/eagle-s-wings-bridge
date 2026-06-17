@@ -8,6 +8,11 @@ export interface FieldConfig {
   required?: boolean;
 }
 
+const inputClass =
+  "w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-foreground transition placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15";
+
+const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
+
 export function FormField({
   field,
   value,
@@ -17,16 +22,17 @@ export function FormField({
   value: string | boolean | number | null;
   onChange: (name: string, value: string | boolean) => void;
 }) {
-  const inputClass =
-    "w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary";
+  const Label = () => (
+    <label className={labelClass}>
+      {field.label}
+      {field.required && <span className="ml-1 text-destructive">*</span>}
+    </label>
+  );
 
   if (field.type === "image") {
     return (
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          {field.label}
-          {field.required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        <Label />
         <ImagePicker value={String(value ?? "")} onChange={(url) => onChange(field.name, url)} />
       </div>
     );
@@ -35,10 +41,7 @@ export function FormField({
   if (field.type === "textarea") {
     return (
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          {field.label}
-          {field.required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        <Label />
         <textarea
           value={String(value ?? "")}
           onChange={(e) => onChange(field.name, e.target.value)}
@@ -52,14 +55,14 @@ export function FormField({
 
   if (field.type === "checkbox") {
     return (
-      <label className="flex items-center gap-3 cursor-pointer">
+      <label className="flex cursor-pointer items-center gap-3">
         <input
           type="checkbox"
           checked={Boolean(value)}
           onChange={(e) => onChange(field.name, e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+          className="h-4 w-4 rounded border-border accent-primary"
         />
-        <span className="text-sm font-medium text-slate-700">{field.label}</span>
+        <span className="text-sm font-medium text-foreground">{field.label}</span>
       </label>
     );
   }
@@ -67,10 +70,7 @@ export function FormField({
   if (field.type === "select") {
     return (
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          {field.label}
-          {field.required && <span className="text-red-500 ml-1">*</span>}
-        </label>
+        <Label />
         <select
           value={String(value ?? "")}
           onChange={(e) => onChange(field.name, e.target.value)}
@@ -90,10 +90,7 @@ export function FormField({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700 mb-1.5">
-        {field.label}
-        {field.required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+      <Label />
       <input
         type={field.type === "datetime" ? "datetime-local" : field.type}
         value={String(value ?? "")}

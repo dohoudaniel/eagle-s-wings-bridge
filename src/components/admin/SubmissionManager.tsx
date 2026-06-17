@@ -75,7 +75,7 @@ export function SubmissionManager<T extends { id: string }>({
         <button
           type="button"
           onClick={() => setViewing(item)}
-          className="p-1.5 text-slate-500 hover:text-primary hover:bg-primary/10 rounded transition"
+          className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-primary/10 hover:text-primary"
         >
           <Eye className="h-4 w-4" />
         </button>
@@ -83,7 +83,7 @@ export function SubmissionManager<T extends { id: string }>({
           <button
             type="button"
             onClick={() => onDownload(item)}
-            className="p-1.5 text-slate-500 hover:text-primary hover:bg-primary/10 rounded transition"
+            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-primary/10 hover:text-primary"
           >
             <Download className="h-4 w-4" />
           </button>
@@ -99,7 +99,7 @@ export function SubmissionManager<T extends { id: string }>({
                 onError(err instanceof Error ? err.message : "Failed to update status");
               }
             }}
-            className="text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:border-primary"
+            className="rounded-lg border border-border bg-background px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
           >
             {statusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -114,31 +114,37 @@ export function SubmissionManager<T extends { id: string }>({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-6">{title}</h2>
+      <h2 className="mb-8 font-display text-3xl font-bold text-foreground">{title}</h2>
       <DataTable columns={[...columns, actionColumn]} data={items} loading={loading} />
 
       {viewing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900">Submission Details</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elegant">
+            <div className="flex items-center justify-between border-b border-border p-6">
+              <h3 className="font-display text-lg font-bold text-foreground">Submission Details</h3>
               <button
                 type="button"
                 onClick={() => setViewing(null)}
-                className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                aria-label="Close"
+                className="rounded-lg p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="space-y-4 p-6">
               {Object.entries(viewing).map(([key, value]) => {
-                if (["id", "notes", "cv_url", "ip_address", "user_agent"].includes(key)) return null;
+                if (["id", "notes", "cv_url", "ip_address", "user_agent"].includes(key))
+                  return null;
                 return (
                   <div key={key}>
-                    <p className="text-xs font-medium text-slate-500 uppercase">{key.replace(/_/g, " ")}</p>
-                    <p className="text-sm text-slate-900 whitespace-pre-wrap">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {key.replace(/_/g, " ")}
+                    </p>
+                    <p className="mt-0.5 whitespace-pre-wrap text-sm text-foreground">
                       {typeof (value as unknown) === "boolean"
-                        ? (value ? "Yes" : "No")
+                        ? value
+                          ? "Yes"
+                          : "No"
                         : value === null
                           ? "—"
                           : String(value)}
@@ -147,20 +153,22 @@ export function SubmissionManager<T extends { id: string }>({
                 );
               })}
               {onNotesChange && (
-                <div>
-                  <label className="block text-xs font-medium text-slate-500 uppercase mb-1">Admin Notes</label>
+                <div className="border-t border-border pt-4">
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Admin Notes
+                  </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={4}
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground transition focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
                   />
-                  <div className="mt-2 flex justify-end">
+                  <div className="mt-3 flex justify-end">
                     <button
                       type="button"
                       onClick={saveNotes}
                       disabled={savingNotes}
-                      className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+                      className="rounded-xl bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-soft transition hover:shadow-glow disabled:opacity-60"
                     >
                       {savingNotes ? "Saving..." : "Save Notes"}
                     </button>

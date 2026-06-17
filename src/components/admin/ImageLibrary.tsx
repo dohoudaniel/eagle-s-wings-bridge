@@ -96,10 +96,10 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Media Library</h2>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <h2 className="font-display text-3xl font-bold text-foreground">Media Library</h2>
         <div className="flex items-center gap-3">
-          <label className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition cursor-pointer disabled:opacity-60">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-primary px-4 py-2.5 font-medium text-primary-foreground shadow-soft transition hover:shadow-glow">
             {uploading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -114,7 +114,7 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
               disabled={uploading}
             />
           </label>
-          <label className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-700 transition cursor-pointer disabled:opacity-60">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 font-medium text-foreground transition hover:bg-muted">
             {uploading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -133,24 +133,24 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
       </div>
 
       {loading ? (
-        <div className="py-20 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        <div className="flex justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : images.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-16 text-center">
-          <p className="text-slate-500">No images uploaded yet.</p>
-          <p className="text-sm text-slate-400 mt-1">
+        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
+          <p className="text-muted-foreground">No images uploaded yet.</p>
+          <p className="mt-1 text-sm text-muted-foreground/70">
             Upload images to use them in programs, stories, and hero slides.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {images.map((image) => (
             <div
               key={image.url}
-              className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition"
+              className="overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-soft"
             >
-              <div className="aspect-square bg-slate-100">
+              <div className="aspect-square bg-muted">
                 {image.name.match(/\.(mp4|webm|ogg)$/i) ? (
                   <video src={image.url} className="h-full w-full object-cover" controls />
                 ) : (
@@ -158,15 +158,15 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
                 )}
               </div>
               <div className="p-3">
-                <p className="text-xs text-slate-500 truncate" title={image.name}>
+                <p className="truncate text-xs text-muted-foreground" title={image.name}>
                   {image.name}
                 </p>
-                <p className="text-xs text-slate-400 mt-0.5">{formatBytes(image.size)}</p>
-                <div className="flex items-center gap-2 mt-3">
+                <p className="mt-0.5 text-xs text-muted-foreground/70">{formatBytes(image.size)}</p>
+                <div className="mt-3 flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => copyUrl(image.url)}
-                    className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 rounded hover:bg-slate-200 transition"
+                    className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg bg-muted px-2 py-1.5 text-xs font-medium text-foreground transition hover:bg-muted/70"
                   >
                     <Copy className="h-3 w-3" />
                     Copy URL
@@ -174,7 +174,8 @@ export function ImageLibrary({ onSuccess, onError }: ImageLibraryProps) {
                   <button
                     type="button"
                     onClick={() => setImageToDelete(image.url)}
-                    className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
+                    aria-label="Delete"
+                    className="rounded-lg p-1.5 text-destructive transition hover:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

@@ -9,16 +9,16 @@ export function ToastContainer({
   onRemove: (id: string) => void;
 }) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div className="fixed right-4 top-4 z-[60] flex flex-col gap-2">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white min-w-[300px] animate-in slide-in-from-right fade-in ${
+          className={`flex min-w-[300px] items-center gap-3 rounded-xl px-4 py-3 text-white shadow-elegant animate-in fade-in slide-in-from-right ${
             toast.type === "success"
-              ? "bg-green-600"
+              ? "bg-success"
               : toast.type === "error"
-                ? "bg-red-600"
-                : "bg-blue-600"
+                ? "bg-destructive"
+                : "bg-primary"
           }`}
         >
           {toast.type === "success" ? (
@@ -32,7 +32,7 @@ export function ToastContainer({
           <button
             type="button"
             onClick={() => onRemove(toast.id)}
-            className="p-1 hover:bg-white/20 rounded"
+            className="rounded p-1 hover:bg-white/20"
           >
             <X className="h-4 w-4" />
           </button>

@@ -45,19 +45,19 @@ function HomePage() {
       ) : (
         <>
           {/* Impact stats */}
-          <section className="relative -mt-20 z-20 container mx-auto px-4 lg:px-8">
-            <div className="bg-card rounded-3xl shadow-elegant border border-border p-8 lg:p-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <section className="relative -mt-12 lg:-mt-16 z-20 container mx-auto px-4 lg:px-8">
+            <div className="bg-card rounded-3xl shadow-elegant border border-border px-6 py-10 sm:px-10 sm:py-12 grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10 lg:gap-y-0 lg:divide-x lg:divide-border">
               {displayStats.map((s) => {
                 const Icon = getIcon(s.icon);
                 return (
-                  <div key={s.id} className="text-center lg:text-left">
-                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground mb-3">
-                      {Icon ? <Icon className="h-5 w-5" /> : null}
+                  <div key={s.id} className="flex flex-col items-center text-center lg:px-8">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-soft mb-4">
+                      {Icon ? <Icon className="h-6 w-6" /> : null}
                     </div>
                     <div className="text-3xl lg:text-4xl font-bold font-display text-foreground">
                       <Counter to={s.value} suffix={s.suffix || ""} />
                     </div>
-                    <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
+                    <div className="text-sm text-muted-foreground mt-2 leading-snug">{s.label}</div>
                   </div>
                 );
               })}
