@@ -94,6 +94,10 @@ export function ResourceManager<T>({
         let value = formData[f.name];
         if (f.type === "number") {
           value = value === "" ? null : Number(value);
+        } else if (!f.required && value === "") {
+          // Empty optional field → null, not "". An empty string fails typed
+          // validators (e.g. EmailStr) with a 422; null clears the field instead.
+          value = null;
         }
         payload[f.name] = value;
       });
